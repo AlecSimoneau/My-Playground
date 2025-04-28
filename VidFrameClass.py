@@ -2,26 +2,20 @@ import cv2 as cv
 import numpy as np
 import keyboard as kb
 ## VARS ##
-
-#temp iteratable
-j = 1 
-
-pixX = None
-pixY = None
-pixPosition = [pixX,pixY]
+pixPosition = []
 oldSize = (127,127)
 ##########
 
 class VidFrame():
 
     #Initializes with height, width and color channels 
-    def __init__(self, height = oldSize[0], width = oldSize[1], channels = 3,pixX, pixY, pixPosition):
+    def __init__(self,pixPosition, height = oldSize[0], width = oldSize[1], channels = 3):
         self.height = height
         self.width = width
         self.channels = channels
-        self.pixX = pixX
-        self.pixY = pixY
-        pixPosition = [pixX,pixY]
+        self.pixPosition = pixPosition
+        
+        
     
     # this should make a black image with the atributes height, width and channels
     def makeFrame(self):
@@ -46,40 +40,44 @@ class VidFrame():
     ## This just makes a window with a 'title' and puts the image 'frame' in it
     def show(self,title: str,name):#,delay):
         cv.imshow(title,name)
-    
-    
-    ### When called I want the following four functions to update the pixel position to one pixel adjacent to the original position
-    def moveRight(self,im,pixPositon):
+        
+        # Keeps the window until you press a key
+        cv.waitKey(0)
 
-        pixPositionOld = pixPosition
-        pixPositionNew = [pixPosition[0]+1,pixPosition[1]]
+    def moveUp(self,im):
+        pixPositionOld = self.pixPosition
+        pixPositionNew = [int(pixPositionOld[0])+1,pixPositionOld[1]]
         im[pixPositionNew] = [255,255,255]
         im[pixPositionOld] = [0,0,0]
+        print("Moved Up!")
+        return im,pixPositionNew
+
+    def moveDown(self,im):
+        pixPositionOld = self.pixPosition
+        pixPositionNew = [int(pixPositionOld[0])-1,pixPositionOld[1]]
+        im[pixPositionNew] = [255,255,255]    
+        im[pixPositionOld] = [0,0,0]    
+        print("Moved Down!")
+        return im,pixPositionNew
+
+    def moveRight(self,im):
+        pixPositionOld = self.pixPosition
+        pixPositionNew = [pixPositionOld[0],int(pixPositionOld[1])+1]
+        im[pixPositionOld] = [0,0,0]
+        im[pixPositionNew] = [255,255,255]
         print("Moved Right!")
+        return im,pixPositionNew
 
     def moveLeft(self,im):
-        pixPositionOld = pixPosition
-        pixPositionNew = [pixX-1,pixY]
-        im[pixPositionNew] = [255,255,255]        
+        pixPositionOld = self.pixPosition
+        pixPositionNew = [pixPositionOld[0],int(pixPositionOld[1])-1]
+        im[pixPositionOld] = [0,0,0]
+        im[pixPositionNew] = [255,255,255]
         print("Moved Left!")
-        
-    def moveUp(self,im):
-        pixPositionOld = pixPosition
-        pixPositionNew = [pixX,pixY+1]
-        im[pixPositionNew] = [255,255,255]
-        print("Moved Up!")
-        
-    def moveDown(self,im):
-        pixPositionOld = pixPosition
-        pixPositionNew = [pixX,pixY-1]
-        im[pixPositionNew] = [255,255,255]
-        print("Moved Down!")
-    ###
-    
-    ## This is where I might center the pixel, but I want to solve the above functions first
-    def center(image):
-        pass
+        return im, pixPositionNew
 
+    def center(self,im):
+        pass
 
 # Move logic
 
