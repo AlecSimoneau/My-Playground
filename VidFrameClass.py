@@ -14,8 +14,7 @@ class VidFrame():
         self.width = width
         self.channels = channels
         self.pixPosition = pixPosition
-        
-        
+                
     
     # this should make a black image with the atributes height, width and channels
     def makeFrame(self):
@@ -44,40 +43,40 @@ class VidFrame():
         # Keeps the window until you press a key
         cv.waitKey(0)
 
-    def moveUp(self,im):
-        pixPositionOld = self.pixPosition
-        pixPositionNew = [int(pixPositionOld[0])+1,pixPositionOld[1]]
-        im[pixPositionNew] = [255,255,255]
-        im[pixPositionOld] = [0,0,0]
-        print("Moved Up!")
-        return im,pixPositionNew
+    def moveDown(self,im,scaleFactor):
+        self.upScale(-1*scaleFactor,im)
+        im[self.pixPosition[0], self.pixPosition[1]] = [0,0,0]
+        pixPositionNew = [int(self.pixPosition[0])+1,int(self.pixPosition[1])]
+        im[pixPositionNew[0],pixPositionNew[1]] = [0,0,255]
+        self.pixPosition = pixPositionNew
+        return self.show("title",self.upScale(scaleFactor,im))
 
-    def moveDown(self,im):
-        pixPositionOld = self.pixPosition
-        pixPositionNew = [int(pixPositionOld[0])-1,pixPositionOld[1]]
-        im[pixPositionNew] = [255,255,255]    
-        im[pixPositionOld] = [0,0,0]    
-        print("Moved Down!")
-        return im,pixPositionNew
+    def moveUp(self,im,scaleFactor):
+        self.upScale(-1*scaleFactor,im)
+        im[self.pixPosition[0], self.pixPosition[1]] = [0,0,0]  
+        pixPositionNew = [int(self.pixPosition[0])-1,int(self.pixPosition[1])]
+        im[pixPositionNew[0],pixPositionNew[1]] = [0,0,255]  
+        self.pixPosition = pixPositionNew  
+        return self.show("title",self.upScale(scaleFactor,im))
 
-    def moveRight(self,im):
-        pixPositionOld = self.pixPosition
-        pixPositionNew = [pixPositionOld[0],int(pixPositionOld[1])+1]
-        im[pixPositionOld] = [0,0,0]
-        im[pixPositionNew] = [255,255,255]
-        print("Moved Right!")
-        return im,pixPositionNew
+    def moveRight(self,im,scaleFactor):
+        self.upScale(-1*scaleFactor,im)
+        im[self.pixPosition[0], self.pixPosition[1]] = [0,0,0]
+        pixPositionNew = [int(self.pixPosition[0]),int(self.pixPosition[1])+1]
+        im[pixPositionNew[0],pixPositionNew[1]] = [0,0,255]
+        self.pixPosition = pixPositionNew
+        return self.show("title",self.upScale(scaleFactor,im))
+        
 
-    def moveLeft(self,im):
-        pixPositionOld = self.pixPosition
-        pixPositionNew = [pixPositionOld[0],int(pixPositionOld[1])-1]
-        im[pixPositionOld] = [0,0,0]
-        im[pixPositionNew] = [255,255,255]
-        print("Moved Left!")
-        return im, pixPositionNew
+    def moveLeft(self,im,scaleFactor):
+        self.upScale(-1*scaleFactor,im)
+        im[self.pixPosition[0], self.pixPosition[1]] = [0,0,0]
+        pixPositionNew = [int(self.pixPosition[0]),int(self.pixPosition[1])-1]
+        im[pixPositionNew[0],pixPositionNew[1]] = [0,0,255]
+        self.pixPosition = pixPositionNew
+        return self.show("title",self.upScale(scaleFactor,im))
+        
 
-    def center(self,im):
-        pass
 
 # Move logic
 
