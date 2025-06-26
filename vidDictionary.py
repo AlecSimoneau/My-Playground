@@ -1,10 +1,10 @@
 import random
-from makeVideo import oldSize, VidFrame
-
+from MakeVideo import oldSize, VidFrame
+import numpy as np
+import cv2 as cv
 #random.seed(1)
 
-
-#a binary from 0 to 100 to use as id's for pixels
+#a binary from 0 to 99 to use as id's for pixels
 ID_One = ['0', '1', '10', '11', '100', '101', '110', '111',  
         '1000', '1001', '1010', '1011', '1100', '1101',
         '1110', '1111', '10000', '10001', '10010', '10011',
@@ -23,12 +23,33 @@ ID_One = ['0', '1', '10', '11', '100', '101', '110', '111',
         '1010010', '1010011', '1010100', '1010101', '1010110', 
         '1010111', '1011000', '1011001', '1011010', '1011011', 
         '1011100', '1011101', '1011110', '1011111', '1100000',
-        '1100001', '1100010', '1100011', '1100100']
+        '1100001', '1100010', '1100011']
+
+#ID_One = []
+# This Code generates an array of 1 to 999 in binary
+#for i in range(0,1000):
+#    ID_One.append(bin(i)[2:])
+
+#print(ID_One)
 
 #### User Variables ######
 var = {}
 placeholder = ""
+scaleFactor = 4
+newCoords = []
+tempCoords = []
+sortedArray = []
+index = 0
+closestPoints = []
 ##########################
+
+#This generates a coordinate grid of oldsize[0] x oldsize[1] 
+for i in range(0,oldSize[0]):
+    for j in range(0,oldSize[1]):
+        newCoords.append((i,j))
+# This randomly selects 100 unique coordinates from newChoords 
+tempCoords.append(random.sample(newCoords,100))
+#########
 
 
 # This loop takes the id's from ID_One and assigns them a random pixel position, and whether its an even or odd
@@ -40,9 +61,8 @@ for id in ID_One:
     if id[-1] == "1":
         placeholder = "blue"
     
-    ###### NEED TO CHANGE ######
-    # posibiity for there to be overlap/same values to be generated so multiple ids have the same pixel position
-    var.update({id: [[random.randint(0,oldSize[0]-1),random.randint(0,oldSize[1])-1], placeholder ]})
+    var.update({id: [tempCoords[0][index], placeholder]})
+    index+=1
 
 # Assigns FRAME_ONE the VidFrame class, and I don't need an individual pixel position
 # Which is why i am passing in None, (throws an error otherwise)
@@ -54,15 +74,60 @@ imageFrame = FRAME_ONE.makeFrame()
 # Draws them on the image that color
 for id in ID_One:
     color = []
-    assert (var.get(id)[1]  == "red" or var.get(id)[1] == "blue"), "Incorrect color id"
+    assert (var.get(id)[1]  == "red" or var.get(id)[1] == "blue"), "Incorrect color id" ## Messing around with assert statements again
     if var.get(id)[1] == "red":
         color = [0,0,250]
     else:
         color = [250,0,0]    
-    imageFrame[int(var.get(id)[0][0]),int(var.get(id)[0][1])] = color
+    imageFrame[var.get(id)[0][0],var.get(id)[0][1]] = color
+
+# A function to calculate the five closest pixels 
+def findDistances(point,dictionary):
+    distances = {}
+
+    for key in dictionary:
+        distances.update([(key,((dictionary.get(key)[0][0] - point[0]) ** 2 + (dictionary.get(key)[0][1] - point[1])**2) ** 0.5)])
+
+    temp = []
+    temp.append(list(distances.values()))
+    sortedDistances = np.sort(temp)[0][1:6]
+
+    for i in range(len(sortedDistances)):
+        for key in distances:
+            value = distances.get(key)
+            if value == sortedDistances[i]:
+                sortedArray.append([key,value])
+
+    return sortedArray
+
+#Selects one random id from ID_One as the point from which the five closest pixels are calculated from
+Point = str(random.sample(ID_One,1)[0])
+
+#Creates an array of the sorted distances from Point with the id attached to each distance
+sortedArray = findDistances(var.get(Point)[0],var)
+
+#from sortedArray, find the pixel position of that id from var and append it to closestPoints in order of 
+#closest to farthest 
+
+for i in range(len(sortedArray)):
+    for key in var:
+        value = var.get(key)[0]
+        if key == sortedArray[i][0]:
+            closestPoints.append([key,value])
+#print("Closest Points: ",closestPoints,"\n")
+
 
 # shows the image with the colored in pixels
-FRAME_ONE.show("title",FRAME_ONE.upScale(5,imageFrame))
+FRAME_ONE.show("title",FRAME_ONE.upScale(scaleFactor,imageFrame))
 
-
-
+# draws a line from Point to the closest five pixels, with the closest pixel being drawn to in green
+for i in range(len(closestPoints)):
+    # there is repeated code here, i will change up the code to only use the repeated code once in my next update
+    if i > 0:
+        cv.line(img = imageFrame,pt1 = [var.get(Point)[0][1],var.get(Point)[0][0]],pt2 = [closestPoints[i][1][1],closestPoints[i][1][0]],color = [0,0,250],thickness = 1)
+        FRAME_ONE.show("title",FRAME_ONE.upScale(1,imageFrame))
+    else:
+        cv.line(img = imageFrame,pt1 = [var.get(Point)[0][1],var.get(Point)[0][0]],pt2 = [closestPoints[i][1][1],closestPoints[i][1][0]],color = [0,250,0],thickness = 1)
+        FRAME_ONE.show("title",FRAME_ONE.upScale(1,imageFrame))
+    
+        
