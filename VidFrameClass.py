@@ -75,10 +75,3 @@ class VidFrame():
         im[pixPositionNew[0],pixPositionNew[1]] = [0,0,255]
         self.pixPosition = pixPositionNew
         return self.show("title",self.upScale(scaleFactor,im))
-        
-
-
-# Move logic
-
-# pixel position
-# move -> on([x + a , y + b]) = [x_new,y_new] & delete([x_old,y_old])
