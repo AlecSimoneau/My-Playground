@@ -1,4 +1,4 @@
-from vidFrame import VidFrame, oldSize
+from VidFrameClass import VidFrame, oldSize
 im = VidFrame()
 points = []
 image,_ = im.makeFrame(numOfPixels=15,color=[0,250,0])
